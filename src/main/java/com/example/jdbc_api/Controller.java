@@ -1,6 +1,5 @@
 package com.example.jdbc_api;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,11 +11,13 @@ import java.util.List;
 @RequestMapping("/")
 public class Controller {
 
-    @Autowired
     WorkingDB workingDB;
+    public Controller(WorkingDB workingDB) {
+        this.workingDB = workingDB;
+    }
 
     @GetMapping("/products/fetch-product")
-    public List<String> Profile(@RequestParam String name) {
+    public List<String> profile(@RequestParam String name) {
 
             return workingDB.getProductName(name);
     }

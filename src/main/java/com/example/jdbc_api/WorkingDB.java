@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 
 import java.io.BufferedReader;
@@ -15,15 +14,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Repository
-@Component
 public class WorkingDB {
 
-    @Autowired
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
+    final String scriptFileName = "request.sql";
+    public String readF;
 
-    private String scriptFileName = "request.sql";
+    public WorkingDB(NamedParameterJdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.readF = read(scriptFileName);
+    }
 
-    protected String read(String scriptFileName) {
+    private String read(String scriptFileName) {
         try (InputStream is = new ClassPathResource(scriptFileName).getInputStream();
              BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is))) {
             return bufferedReader.lines().collect(Collectors.joining("\n"));
@@ -32,14 +34,8 @@ public class WorkingDB {
         }
     }
 
-    protected List<String> getProductName(String name) {
-        String readF = read(scriptFileName);
-        System.out.println(readF);
+    public List<String> getProductName(String name) {
         MapSqlParameterSource parameters = new MapSqlParameterSource("name", name);
-        List<String> product = jdbcTemplate.queryForList(readF, parameters, String.class);
-//        для отладки
-        System.out.println(product);
-
-        return product;
+        return jdbcTemplate.queryForList(readF, parameters, String.class);
     }
 }
